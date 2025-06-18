@@ -10,7 +10,7 @@ const authRoute = require('./routes/auth');
 const app = express();
 app.use(express.json()); // to process JSON in request body
 
-
+//app.js
 app.use(express.static('public'));
 
 app.use('/modules', modulesRoute);
