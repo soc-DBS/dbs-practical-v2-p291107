@@ -24,3 +24,4 @@ module.exports.enrolNewStudent = function enrolNewStudent(adminNumber, studentNa
             throw error;
         });
 };
+

@@ -72,4 +72,4 @@ module.exports.retrieveBulk = function retrieveBulk(codes) {
         }
         return result;
     });
-    };
+};
