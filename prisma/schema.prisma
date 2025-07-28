@@ -81,3 +81,67 @@ model userRole {
 
   @@map("user_role")
 }
+
+
+//new module
+model module {
+modCode String @id @map("mod_code") @db.VarChar(10) //Change this field’s type
+modName String @map("mod_name") @db.VarChar(100)
+creditUnit Int @map("credit_unit")
+modCoord String? @map("mod_coord") @db.Char(4) //Add this field
+}
+
+//create staffDependent
+model StaffDependent {
+  staffNo       String @map("staff_no") @db.Char(4)
+  dependentName String @map("dependent_name") @db.VarChar(30)
+  relationship  String @map("relationship") @db.VarChar(20)
+  
+  @@id([staffNo, dependentName])
+  
+}
+
+//create preRequisite
+model preRequisite {
+  modCode String @map("mod_code") @db.VarChar(10)
+  requisite String @map("requisite") @db.VarChar(10)
+
+  @@id([modCode, requisite])
+  @@map("pre_requisite")
+}
+
+//create country
+model country {
+  countryName String @id @map("country_name") @db.VarChar(30)
+  language String @map("language") @db.VarChar(30)
+  region String @map("region") @db.VarChar(30)
+
+  
+  @@map("country")
+}
+
+//create student
+model student {
+  admNo String @id @map("adm_no") @db.Char(4)
+  studName String @map("stud_name") @db.VarChar(30)
+  gender String @map("gender") @db.Char(1)
+  address String @map("address") @db.VarChar(100)
+  mobilePhone String @map("mobile_phone") @db.Char(8)
+  homePhone String @map("home_phone")  @db.Char(8)
+  dob DateTime @map("dob") @db.Date
+  nationality String @map("nationality") @db.VarChar(30)
+  crseCode  String   @map("crse_code") @db.VarChar(5)
+
+  @@map("student")
+}
+
+//create studModPerformance
+model studModPerformance {
+ admNo String @map("adm_no") @db.Char(4)
+ modRegistered String @map("mod_registered") @db.VarChar(10)
+ mark Int @map("mark")
+ grade String @map("grade") @db.Char(2)
+
+ @@id([admNo, modRegistered])
+ @@map("stud_mod_performance")
+}
