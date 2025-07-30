@@ -1,75 +1,92 @@
-const { query } = require('../database');
-const { EMPTY_RESULT_ERROR, SQL_ERROR_CODE, UNIQUE_VIOLATION_ERROR } = require('../errors');
+const { PrismaClient, Prisma } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 module.exports.create = function create(code, name, credit) {
-    const sql = 'CALL create_module($1, $2, $3)';
-    return query(sql, [code, name, credit])
-        .then(function (result) {
-            console.log('Module created successfully');
-        })
-        .catch(function (error) {
-            throw error;
-        });
-};
+    return prisma.module.create({
+        //TODO: Add data
+        data: {
+            modCode: code,
+            modName: name,
+            creditUnit: parseInt(credit)
+        }
+    }).then(function (module) {
+        //TODO: Return module
+        return module;
+    }).catch(function (error) {
+            // Prisma error codes: https://www.prisma.io/docs/orm/reference/error-reference#p2002
+            // TODO: Handle Prisma Error, throw a new error if module already exists                    
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2002') {
+                throw new Error(`The Module ${code} already exists`);
+            }
+        }
+        throw error;
+    });
+}
 
 module.exports.retrieveByCode = function retrieveByCode(code) {
-    const sql = `SELECT * FROM module WHERE mod_code = $1`;
-    return query(sql, [code]).then(function (result) {
-        const rows = result.rows;
-
-        if (rows.length === 0) {
-            // Note: result.rowCount returns the number of rows processed instead of returned
-            // Read more: https://node-postgres.com/apis/result#resultrowcount-int--null
-            throw new EMPTY_RESULT_ERROR(`Module ${code} not found!`);
+    return prisma.module.findUnique({
+        //TODO: Add where
+        where: {
+            modCode: code
         }
-
-        return rows[0];
+    }).then(function (module) {
+        // Prisma error codes: https://www.prisma.io/docs/orm/reference/error-reference#p2025
+        // TODO: Handle Prisma Error, throw a new error if module is not found                            
+        // TODO: Return module
+        if (!module) {
+            throw new Error(`The Module ${code} is not found!`);
+        }
+        return module;
     });
 };
-
+ 
 module.exports.deleteByCode = function deleteByCode(code) {
-    // Note:
-    // If using raw sql: Can use result.rowCount to check the number of rows affected
-    // But if using function/stored procedure, result.rowCount will always return null
-    const sql = 'CALL delete_module($1)';
-    return query(sql, [code])
-        .then(function (result) {
-            console.log('Module deleted successfully');
-        }).catch(function (error) {
-            throw error;
-        });
+    return prisma.module.delete({
+        //TODO: Add where
+        where: {
+            modCode: code
+        }
+    }).then(function (module) {
+        // Leave blank
+    }).catch(function (error) {
+        // Prisma error codes: https://www.prisma.io/docs/orm/reference/error-reference#p2025
+        // TODO: Handle Prisma Error, throw a new error if module is not found                            
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+                throw new Error(`The Module ${code} is not found!`);
+            }
+        }
+        throw error;
+    })
 };
-
+ 
 module.exports.updateByCode = function updateByCode(code, credit) {
-    // Note:
-    // If using raw sql: Can use result.rowCount to check the number of rows affected
-    // But if using function/stored procedure, result.rowCount will always return null
-    const sql = 'CALL update_module($1, $2)';
-    return query(sql, [code, credit])
-        .then(function (result) {
-            console.log('Module updated successfully');
-        }).catch(function (error) {
-            throw error;
-        });
-};
-
-module.exports.retrieveAll = function retrieveAll() {
-    const sql = `SELECT * FROM module`;
-    return query(sql).then(function (result) {
-        return result.rows;
+    return prisma.module.update({
+        //TODO: Add where and data
+        where: {
+            modCode: code
+        },
+        data: {
+            creditUnit: parseInt(credit)
+        }
+    }).then(function (module) {
+        // Leave blank
+    }).catch(function (error) {
+        // Prisma error codes: https://www.prisma.io/docs/orm/reference/error-reference#p2025
+        // TODO: Handle Prisma Error, throw a new error if module is not found                            
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+                throw new Error(`The Module ${code} is not found!`);
+            }
+        }
+        throw error;    
     });
 };
-
-module.exports.retrieveBulk = function retrieveBulk(codes) {
-    const sql = 'SELECT * FROM module WHERE code IN ($1)';
-    return query(sql, [codes]).then(function (response) {
-        const rows = response.rows;
-        const result = {};
-        for (let i = 0; i < rows.length; i += 1) {
-            const row = rows[i];
-            const code = row.code;
-            result[code] = row;
-        }
-        return result;
+ 
+module.exports.retrieveAll = function retrieveAll() {
+    // TODO: Return all modules
+    return prisma.module.findMany().then(function (modules) {
+        return modules;
     });
 };
